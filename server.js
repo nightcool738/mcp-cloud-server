@@ -1,3 +1,7 @@
+// ======================
+// MCP Cloud Server + Web Dashboard
+// ======================
+
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -5,30 +9,36 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Sistem dizin tanımı
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public"))); // web arayüzü klasörü
+app.use(express.static(path.join(__dirname, "public"))); // Web panel dosyaları
 
-// === MCP Kuyruk sistemi ===
-const TOKEN = process.env.TOKEN || "secret123"; // agent ile aynı olmalı
+// ======================
+// MCP Kuyruk Sistemi
+// ======================
+const TOKEN = process.env.TOKEN || "secret123"; // Agent ile eşleşmeli
 const queue = [];
 const results = new Map();
 
-// Token kontrolü (agent erişimi)
+// Basit auth kontrolü
 function auth(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   if (token !== TOKEN) return res.status(403).send("unauthorized");
   next();
 }
 
-// Yeni komut ekleme (web veya API üzerinden)
+// === API Uçları ===
+
+// Yeni komut ekleme
 app.post("/enqueue", (req, res) => {
   const id = uuidv4();
   queue.push({ id, ...req.body });
-  console.log("🆕 Kuyruğa eklendi:", req.body.tool);
+  console.log("🆕 Kuyruğa eklendi:", req.body.tool || "unknown");
   res.json({ id });
 });
 
@@ -52,11 +62,21 @@ app.get("/result/:id", (req, res) => {
   res.json(results.get(req.params.id) || {});
 });
 
-// === Web Arayüz ===
+// ======================
+// Web Dashboard
+// ======================
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// === Sunucu Başlat ===
+// 404 yakalama (opsiyonel)
+app.use((req, res) => {
+  res.status(404).send("Sayfa bulunamadı 😢");
+});
+
+// ======================
+// Sunucu Başlat
+// ======================
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`☁️ Server + WebUI running on ${PORT}`));
