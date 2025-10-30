@@ -10,3 +10,5 @@ services:
         value: 8080
       - key: TOKEN
         value: secret123
+      - key: OPENAI_API_KEY
+        sync: false  # Render Dashboard'dan manuel olarak eklenecek
