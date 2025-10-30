@@ -2,47 +2,76 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>MCP Control Panel</title>
-  <style>
-    body { background: #111; color: #eee; font-family: sans-serif; max-width: 600px; margin: 50px auto; }
-    h1 { color: #0f0; }
-    input, select, button { width: 100%; padding: 10px; margin: 8px 0; background: #222; color: #eee; border: 1px solid #333; }
-    button { cursor: pointer; background: #0f0; color: #000; font-weight: bold; }
-    pre { background: #222; padding: 10px; border-radius: 5px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Cloud Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>🧠 MCP Command Panel</h1>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+  <header class="p-4 bg-gray-800 shadow-md flex justify-between items-center">
+    <h1 class="text-xl font-semibold">🌩️ MCP Cloud Dashboard</h1>
+    <span class="text-sm text-gray-400">Connected to Agent</span>
+  </header>
 
-  <label>Komut (tool)</label>
-  <select id="tool">
-    <option value="listFiles">listFiles</option>
-    <option value="readFile">readFile</option>
-    <option value="runScript">runScript</option>
-    <option value="writeFile">writeFile</option>
-    <option value="getSystemInfo">getSystemInfo</option>
-  </select>
+  <main class="flex-1 p-6 max-w-4xl mx-auto">
+    <div class="bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+      <h2 class="text-lg mb-3 font-semibold">Komut Gönder</h2>
+      <div class="flex gap-3">
+        <input id="tool" placeholder="Araç (ör. listFiles)" class="flex-1 p-2 rounded bg-gray-700 focus:outline-none">
+        <input id="param" placeholder="Parametre (ör. C:\\)" class="flex-1 p-2 rounded bg-gray-700 focus:outline-none">
+        <button onclick="sendCommand()" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">Gönder</button>
+      </div>
+    </div>
 
-  <label>Parametre (ör: {"path":"C:\\\\"})</label>
-  <input id="params" placeholder='{"path":"C:\\\\"}' />
+    <div class="space-y-4" id="commands"></div>
+  </main>
 
-  <button onclick="sendCommand()">Komutu Gönder</button>
-
-  <h2>Sonuç</h2>
-  <pre id="output">henüz yok</pre>
+  <footer class="p-4 text-center text-gray-500 text-sm">
+    MCP Cloud Server © 2025
+  </footer>
 
   <script>
     async function sendCommand() {
-      const tool = document.getElementById('tool').value;
-      const params = JSON.parse(document.getElementById('params').value || '{}');
+      const tool = document.getElementById('tool').value.trim();
+      const param = document.getElementById('param').value.trim();
+      if (!tool) return alert("Araç adı gerekli.");
+
       const res = await fetch('/enqueue', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({tool, params})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tool, params: { path: param } })
       });
       const data = await res.json();
-      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      renderCommand(tool, data.id);
+    }
+
+    async function renderCommand(tool, id) {
+      const container = document.getElementById('commands');
+      const card = document.createElement('div');
+      card.className = "bg-gray-800 rounded-xl p-4 shadow-md border border-gray-700";
+      card.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold text-blue-400">${tool}</span>
+          <span class="text-xs text-gray-400">ID: ${id.slice(0,8)}...</span>
+        </div>
+        <pre id="out-${id}" class="text-sm bg-gray-900 rounded p-3 overflow-auto max-h-60 text-gray-300">Bekleniyor...</pre>
+      `;
+      container.prepend(card);
+      pollResult(id);
+    }
+
+    async function pollResult(id) {
+      for (let i=0; i<30; i++) {
+        const res = await fetch(`/result/${id}`);
+        const data = await res.json();
+        if (Object.keys(data).length > 0) {
+          document.getElementById(`out-${id}`).innerText = JSON.stringify(data, null, 2);
+          return;
+        }
+        await new Promise(r => setTimeout(r, 3000));
+      }
+      document.getElementById(`out-${id}`).innerText = "⏳ Zaman aşımı (agent yanıt vermedi)";
     }
   </script>
-</body>    
+</body>
 </html>
+ml>
