@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: mcp-cloud-server-nightcool
+    name: mcp-cloud-server-1
     env: node
     plan: free
     buildCommand: "npm install"
