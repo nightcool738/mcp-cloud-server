@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>MCP Control Panel</title>
+  <style>
+    body { background: #111; color: #eee; font-family: sans-serif; max-width: 600px; margin: 50px auto; }
+    h1 { color: #0f0; }
+    input, select, button { width: 100%; padding: 10px; margin: 8px 0; background: #222; color: #eee; border: 1px solid #333; }
+    button { cursor: pointer; background: #0f0; color: #000; font-weight: bold; }
+    pre { background: #222; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>🧠 MCP Command Panel</h1>
+
+  <label>Komut (tool)</label>
+  <select id="tool">
+    <option value="listFiles">listFiles</option>
+    <option value="readFile">readFile</option>
+    <option value="runScript">runScript</option>
+    <option value="writeFile">writeFile</option>
+    <option value="getSystemInfo">getSystemInfo</option>
+  </select>
+
+  <label>Parametre (ör: {"path":"C:\\\\"})</label>
+  <input id="params" placeholder='{"path":"C:\\\\"}' />
+
+  <button onclick="sendCommand()">Komutu Gönder</button>
+
+  <h2>Sonuç</h2>
+  <pre id="output">henüz yok</pre>
+
+  <script>
+    async function sendCommand() {
+      const tool = document.getElementById('tool').value;
+      const params = JSON.parse(document.getElementById('params').value || '{}');
+      const res = await fetch('/enqueue', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({tool, params})
+      });
+      const data = await res.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
