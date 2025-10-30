@@ -66,6 +66,21 @@ app.get("/result/:id", (req, res) => {
 // Web Dashboard
 // ======================
 
+// Debug endpoint - klasör kontrolü
+app.get("/debug", (req, res) => {
+  const fs = require("fs");
+  const publicPath = path.join(__dirname, "public");
+  const indexPath = path.join(publicPath, "index.html");
+  res.json({
+    __dirname,
+    publicPath,
+    indexPath,
+    publicExists: fs.existsSync(publicPath),
+    indexExists: fs.existsSync(indexPath),
+    files: fs.existsSync(publicPath) ? fs.readdirSync(publicPath) : []
+  });
+});
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });

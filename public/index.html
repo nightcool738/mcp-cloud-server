@@ -3,296 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MCP Cloud Dashboard Pro</title>
+  <title>MCP Cloud Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-gray-100 min-h-screen">
-  
-  <!-- Header -->
-  <header class="bg-black/40 backdrop-blur-lg border-b border-purple-500/20 sticky top-0 z-50">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-          <span class="text-2xl">☁️</span>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">MCP Cloud Pro</h1>
-          <p class="text-xs text-gray-400">Uzak Masaüstü Kontrol Paneli</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/30">
-          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <span class="text-xs text-green-400">Agent Aktif</span>
-        </div>
-      </div>
-    </div>
+<body class="bg-slate-950 text-gray-100 min-h-screen flex flex-col items-center p-6">
+
+  <header class="text-center mb-8">
+    <h1 class="text-3xl font-bold text-blue-400">🧩 MCP Cloud Dashboard</h1>
+    <p class="text-gray-400 mt-2">Agent bağlantı durumu, komut gönderme ve sonuç izleme</p>
   </header>
 
-  <div class="container mx-auto px-6 py-8">
-    
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20">
-        <div class="text-3xl mb-2">📊</div>
-        <div class="text-2xl font-bold" id="stat-total">0</div>
-        <div class="text-sm text-gray-400">Toplam Komut</div>
+  <!-- Durum Kartı -->
+  <section class="w-full max-w-4xl bg-slate-900 rounded-2xl shadow-lg p-4 mb-6 border border-slate-800">
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-lg font-semibold text-blue-300">Bağlantı Durumu</h2>
+        <p id="status" class="text-sm text-gray-400">⏳ Agent durumu kontrol ediliyor...</p>
       </div>
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/20">
-        <div class="text-3xl mb-2">⚡</div>
-        <div class="text-2xl font-bold" id="stat-pending">0</div>
-        <div class="text-sm text-gray-400">Beklemede</div>
-      </div>
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-green-500/20">
-        <div class="text-3xl mb-2">✅</div>
-        <div class="text-2xl font-bold" id="stat-success">0</div>
-        <div class="text-sm text-gray-400">Başarılı</div>
-      </div>
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-pink-500/20">
-        <div class="text-3xl mb-2">⏱️</div>
-        <div class="text-2xl font-bold" id="stat-time">0s</div>
-        <div class="text-sm text-gray-400">Ort. Süre</div>
-      </div>
+      <button onclick="checkStatus()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">Yenile</button>
     </div>
+  </section>
 
-    <!-- Command Categories -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      
-      <!-- Dosya İşlemleri -->
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-          <span class="text-2xl">📁</span>
-          Dosya İşlemleri
-        </h2>
-        <div class="space-y-2">
-          <button onclick="quickCmd('listFiles', {path: 'C:\\'})" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">📋 C:\ Listele</div>
-            <div class="text-xs text-gray-400">Tüm dosyaları göster</div>
-          </button>
-          <button onclick="quickCmd('listFiles', {path: 'C:\\Users'})" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">👤 Users Klasörü</div>
-            <div class="text-xs text-gray-400">Kullanıcı dizinleri</div>
-          </button>
-          <button onclick="quickCmd('listFiles', {path: 'C:\\Windows'})" class="w-full bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">🪟 Windows Klasörü</div>
-            <div class="text-xs text-gray-400">Sistem dosyaları</div>
-          </button>
-          <button onclick="customPath('listFiles')" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">✏️ Özel Klasör</div>
-            <div class="text-xs text-gray-200">Kendi yolunu gir</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Sistem Komutları -->
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/20">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-          <span class="text-2xl">⚙️</span>
-          Sistem Komutları
-        </h2>
-        <div class="space-y-2">
-          <button onclick="quickCmd('executeCommand', {command: 'systeminfo'})" class="w-full bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">💻 Sistem Bilgisi</div>
-            <div class="text-xs text-gray-400">PC özellikleri</div>
-          </button>
-          <button onclick="quickCmd('executeCommand', {command: 'tasklist'})" class="w-full bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">📊 Çalışan Programlar</div>
-            <div class="text-xs text-gray-400">Task listesi</div>
-          </button>
-          <button onclick="quickCmd('executeCommand', {command: 'ipconfig /all'})" class="w-full bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">🌐 Ağ Bilgileri</div>
-            <div class="text-xs text-gray-400">IP ve MAC adresi</div>
-          </button>
-          <button onclick="customCommand()" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">⚡ Özel Komut</div>
-            <div class="text-xs text-gray-200">CMD komutu gir</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Hızlı İşlemler -->
-      <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-green-500/20">
-        <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-          <span class="text-2xl">⚡</span>
-          Hızlı İşlemler
-        </h2>
-        <div class="space-y-2">
-          <button onclick="quickCmd('screenshot', {})" class="w-full bg-green-600/20 hover:bg-green-600/40 border border-green-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">📸 Ekran Görüntüsü</div>
-            <div class="text-xs text-gray-400">Anında screenshot</div>
-          </button>
-          <button onclick="quickCmd('readFile', {path: 'C:\\Windows\\System32\\drivers\\etc\\hosts'})" class="w-full bg-green-600/20 hover:bg-green-600/40 border border-green-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">📄 Hosts Dosyası</div>
-            <div class="text-xs text-gray-400">Oku ve göster</div>
-          </button>
-          <button onclick="quickCmd('executeCommand', {command: 'wmic cpu get name'})" class="w-full bg-green-600/20 hover:bg-green-600/40 border border-green-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">🔧 CPU Bilgisi</div>
-            <div class="text-xs text-gray-400">İşlemci modeli</div>
-          </button>
-          <button onclick="quickCmd('executeCommand', {command: 'wmic os get caption,version'})" class="w-full bg-green-600/20 hover:bg-green-600/40 border border-green-500/30 rounded-lg p-3 text-left transition-all hover:scale-105">
-            <div class="font-semibold">🪟 Windows Sürümü</div>
-            <div class="text-xs text-gray-400">OS bilgisi</div>
-          </button>
-        </div>
-      </div>
-
+  <!-- Hazır Komutlar -->
+  <section class="w-full max-w-4xl bg-slate-900 rounded-2xl shadow-lg p-6 mb-6 border border-slate-800">
+    <h2 class="text-lg font-semibold mb-4 text-blue-300">Hazır Komutlar</h2>
+    <div class="flex flex-wrap gap-3">
+      <button onclick="quickCmd('getSystemInfo')" class="btn">🧠 Sistem Bilgisi</button>
+      <button onclick="quickCmd('listFiles', { path: 'C:\\\\' })" class="btn">📂 C:\\ Listele</button>
+      <button onclick="quickCmd('readFile', { path: 'C:\\\\mcp\\\\agent.js' })" class="btn">📄 agent.js Oku</button>
+      <button onclick="quickCmd('findDuplicates', { path: 'C:\\\\mcp\\\\' })" class="btn">🧩 Kopya Dosyaları Bul</button>
+      <button onclick="quickCmd('runScript', { path: 'C:\\\\mcp\\\\scripts\\\\backup.bat' })" class="btn">⚙️ Script Çalıştır</button>
     </div>
+  </section>
 
-    <!-- Advanced Commands -->
-    <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-pink-500/20 mb-8">
-      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-        <span class="text-2xl">🚀</span>
-        Gelişmiş Komutlar
-      </h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <button onclick="quickCmd('executeCommand', {command: 'netstat -ano'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">🔌</div>
-          <div class="font-semibold text-sm">Ağ Bağlantıları</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'dir C:\\ /s /b *.txt'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">🔍</div>
-          <div class="font-semibold text-sm">TXT Dosya Ara</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'wmic logicaldisk get name,freespace,size'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">💾</div>
-          <div class="font-semibold text-sm">Disk Alanı</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'wmic process list brief'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">⚙️</div>
-          <div class="font-semibold text-sm">Proses Listesi</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'powershell Get-Process | Sort-Object CPU -Descending | Select-Object -First 10'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">📈</div>
-          <div class="font-semibold text-sm">En Çok CPU</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'gpresult /R'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">🛡️</div>
-          <div class="font-semibold text-sm">Grup İlkeleri</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'net user'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">👥</div>
-          <div class="font-semibold text-sm">Kullanıcılar</div>
-        </button>
-        <button onclick="quickCmd('executeCommand', {command: 'powershell Get-EventLog -LogName System -Newest 10'})" class="bg-pink-600/20 hover:bg-pink-600/40 border border-pink-500/30 rounded-lg p-4 transition-all hover:scale-105">
-          <div class="text-2xl mb-2">📝</div>
-          <div class="font-semibold text-sm">Sistem Logları</div>
-        </button>
-      </div>
-    </div>
+  <!-- Sonuç Alanı -->
+  <section class="w-full max-w-4xl bg-slate-900 rounded-2xl shadow-lg p-6 border border-slate-800">
+    <h2 class="text-lg font-semibold mb-4 text-blue-300">Sonuç</h2>
+    <pre id="output" class="bg-slate-950 p-4 rounded-lg text-sm overflow-auto max-h-96 border border-slate-800 text-gray-300">Henüz bir sonuç yok.</pre>
+  </section>
 
-    <!-- Command Results -->
-    <div class="bg-black/30 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/20">
-      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-        <span class="text-2xl">📊</span>
-        Komut Sonuçları
-        <button onclick="clearResults()" class="ml-auto text-sm bg-red-600/20 hover:bg-red-600/40 px-3 py-1 rounded-lg border border-red-500/30">
-          🗑️ Temizle
-        </button>
-      </h2>
-      <div id="results" class="space-y-3">
-        <div class="text-center text-gray-500 py-8">
-          Henüz komut çalıştırılmadı. Yukarıdaki butonlardan birini seç!
-        </div>
-      </div>
-    </div>
-
-  </div>
+  <style>
+    .btn {
+      background: #2563eb;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+    .btn:hover { background: #1e40af; }
+  </style>
 
   <script>
-    let stats = { total: 0, pending: 0, success: 0, totalTime: 0 };
+    const SERVER = "/mcp/run";
 
-    async function quickCmd(tool, params) {
-      const startTime = Date.now();
-      stats.total++;
-      stats.pending++;
-      updateStats();
-
-      const res = await fetch('/enqueue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tool, params })
-      });
-      const data = await res.json();
-      renderResult(tool, params, data.id, startTime);
-    }
-
-    function customPath(tool) {
-      const path = prompt('Klasör yolunu gir (örn: C:\\Users\\Documents):', 'C:\\');
-      if (path) quickCmd(tool, { path });
-    }
-
-    function customCommand() {
-      const cmd = prompt('CMD komutunu gir (örn: dir, ipconfig):', 'dir');
-      if (cmd) quickCmd('executeCommand', { command: cmd });
-    }
-
-    async function renderResult(tool, params, id, startTime) {
-      const container = document.getElementById('results');
-      if (container.querySelector('.text-gray-500')) {
-        container.innerHTML = '';
-      }
-
-      const card = document.createElement('div');
-      card.className = "bg-gradient-to-r from-purple-900/30 to-pink-900/30 rounded-xl p-4 border border-purple-500/30 animate-pulse";
-      card.innerHTML = `
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <div class="font-bold text-lg">${tool}</div>
-            <div class="text-xs text-gray-400 mt-1">${JSON.stringify(params)}</div>
-          </div>
-          <div class="text-right">
-            <div class="text-xs text-gray-400">ID: ${id.slice(0,8)}</div>
-            <div class="text-xs text-yellow-400 mt-1">⏳ Bekleniyor...</div>
-          </div>
-        </div>
-        <pre id="out-${id}" class="bg-black/50 rounded-lg p-4 text-sm overflow-auto max-h-96 border border-gray-700">Sonuç bekleniyor...</pre>
-      `;
-      container.prepend(card);
-      pollResult(id, startTime);
-    }
-
-    async function pollResult(id, startTime) {
-      for (let i = 0; i < 30; i++) {
-        const res = await fetch(`/result/${id}`);
+    async function checkStatus() {
+      document.getElementById("status").textContent = "🔄 Agent kontrol ediliyor...";
+      try {
+        const res = await fetch(SERVER, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tool: "getSystemInfo", params: {} })
+        });
+        if (!res.ok) throw new Error("Sunucu yanıt vermedi");
         const data = await res.json();
-        if (Object.keys(data).length > 0) {
-          const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-          stats.pending--;
-          stats.success++;
-          stats.totalTime += parseFloat(elapsed);
-          updateStats();
-
-          const card = document.getElementById(`out-${id}`).parentElement.parentElement;
-          card.className = "bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-xl p-4 border border-green-500/30";
-          card.querySelector('.text-yellow-400').className = "text-xs text-green-400 mt-1";
-          card.querySelector('.text-yellow-400').innerHTML = `✅ Tamamlandı (${elapsed}s)`;
-          document.getElementById(`out-${id}`).innerText = JSON.stringify(data, null, 2);
-          return;
-        }
-        await new Promise(r => setTimeout(r, 2000));
-      }
-      stats.pending--;
-      updateStats();
-      const card = document.getElementById(`out-${id}`).parentElement.parentElement;
-      card.className = "bg-gradient-to-r from-red-900/30 to-orange-900/30 rounded-xl p-4 border border-red-500/30";
-      document.getElementById(`out-${id}`).innerText = "❌ Zaman aşımı - Agent yanıt vermedi";
-    }
-
-    function updateStats() {
-      document.getElementById('stat-total').innerText = stats.total;
-      document.getElementById('stat-pending').innerText = stats.pending;
-      document.getElementById('stat-success').innerText = stats.success;
-      const avgTime = stats.success > 0 ? (stats.totalTime / stats.success).toFixed(1) : 0;
-      document.getElementById('stat-time').innerText = avgTime + 's';
-    }
-
-    function clearResults() {
-      if (confirm('Tüm sonuçları silmek istediğinden emin misin?')) {
-        document.getElementById('results').innerHTML = '<div class="text-center text-gray-500 py-8">Henüz komut çalıştırılmadı. Yukarıdaki butonlardan birini seç!</div>';
-        stats = { total: 0, pending: 0, success: 0, totalTime: 0 };
-        updateStats();
+        document.getElementById("status").textContent =
+          `✅ Agent aktif (${data.platform || "bilinmiyor"})`;
+      } catch (err) {
+        document.getElementById("status").textContent =
+          "❌ Agent bağlantısı yok: " + err.message;
       }
     }
+
+    async function quickCmd(tool, params = {}) {
+      const output = document.getElementById("output");
+      output.textContent = "⏳ Komut gönderiliyor...";
+      try {
+        const res = await fetch(SERVER, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tool, params })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        output.textContent = "❌ Hata: " + err.message;
+      }
+    }
+
+    checkStatus();
   </script>
 </body>
 </html>

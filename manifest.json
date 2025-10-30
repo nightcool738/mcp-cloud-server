@@ -1,0 +1,45 @@
+{
+  "name": "MCP Cloud Server",
+  "description": "Yerel agent'ı kontrol eden ve komut kuyruğu yöneten MCP uyumlu sunucu",
+  "version": "1.1.0",
+  "tools": [
+    {
+      "name": "listFiles",
+      "description": "Belirtilen dizindeki dosyaları listeler",
+      "parameters": {
+        "path": { "type": "string", "description": "Listelenecek klasör yolu" }
+      }
+    },
+    {
+      "name": "readFile",
+      "description": "Belirtilen dosyanın içeriğini okur",
+      "parameters": {
+        "path": { "type": "string", "description": "Dosya yolu" }
+      }
+    },
+    {
+      "name": "writeFile",
+      "description": "Yeni bir dosya oluşturur veya var olanı yazar",
+      "parameters": {
+        "path": { "type": "string", "description": "Dosya yolu" },
+        "content": { "type": "string", "description": "Yazılacak içerik" }
+      }
+    },
+    {
+      "name": "runScript",
+      "description": "Yerel script veya batch dosyasını çalıştırır",
+      "parameters": {
+        "path": { "type": "string", "description": "Script dosyası yolu" }
+      }
+    },
+    {
+      "name": "getSystemInfo",
+      "description": "Sistem bilgilerini döndürür",
+      "parameters": {}
+    }
+  ],
+  "server": {
+    "type": "node",
+    "entry": "mcp-adapter.js"
+  }
+}
